@@ -1,0 +1,12 @@
+# LicenseRef-GB-T-33190-2016-Standard-Document
+
+This directory contains a copy of the national standard document
+GB/T 33190-2016 "电子文件存储与交换格式 版式文档" (Specification for
+electronic document storage and exchange format - Fixed layout documents),
+kept in the repository solely as a development reference.
+
+The standard text is NOT distributed under a free or open-source license.
+Copyright of the standard belongs to the Chinese standardization authority.
+Redistribution of the standard document may be subject to the policies of
+the Standards Press of China. If you redistribute this repository, consider
+removing this file and the corresponding REUSE.toml annotation.

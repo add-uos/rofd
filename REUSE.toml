@@ -1,0 +1,28 @@
+version = 1
+
+# 项目源码与文档默认许可，与 Cargo.toml 的 license 字段、debian/copyright 保持一致
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "2024-2026 HualetWang <hualet@hualet.org>"
+SPDX-License-Identifier = "LGPL-2.1-or-later"
+
+# ofdrw 兼容性测试资源：复制自 ofdrw 项目（Apache-2.0），见
+# tests/ofdrw-compat/PROVENANCE.md
+[[annotations]]
+path = "tests/ofdrw-compat/fixtures/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 ofdrw contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "tests/ofdrw-compat/references/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 ofdrw contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+# 随仓留档的国家标准文本，非自由许可，仅作开发参考
+[[annotations]]
+path = "learning/GBT_33190-2016_*.pdf"
+precedence = "override"
+SPDX-FileCopyrightText = "2016 中国国家标准化管理委员会"
+SPDX-License-Identifier = "LicenseRef-GB-T-33190-2016-Standard-Document"
