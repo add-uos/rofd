@@ -91,4 +91,4 @@ This project is organized into the following directories and files:
 
 # License
 
-This project is under the terms of the [GNU Lesser General Public License v2.1 or later](https://github.com/hualet/rofd/blob/main/LICENSE).
+This project is under the terms of the [GNU Lesser General Public License v2.1 or later](https://github.com/linuxdeepin/rofd/blob/main/LICENSE).
