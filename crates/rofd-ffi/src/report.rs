@@ -6,8 +6,8 @@ use crate::{
     rofd_error_t, rofd_render_diagnostic_t, rofd_render_report_t, rofd_status_t,
     ROFD_DIAGNOSTIC_FONT_FALLBACK, ROFD_DIAGNOSTIC_IMAGE_BORDER_UNSUPPORTED,
     ROFD_DIAGNOSTIC_IMAGE_MASK_UNSUPPORTED, ROFD_DIAGNOSTIC_IMAGE_SUBSTITUTION_UNSUPPORTED,
-    ROFD_DIAGNOSTIC_MISSING_GLYPH, ROFD_DIAGNOSTIC_UNSUPPORTED_OBJECT, ROFD_STATUS_INTERNAL,
-    ROFD_STATUS_PAGE_OUT_OF_RANGE,
+    ROFD_DIAGNOSTIC_MISSING_GLYPH, ROFD_DIAGNOSTIC_SINGULAR_TRANSFORM,
+    ROFD_DIAGNOSTIC_UNSUPPORTED_OBJECT, ROFD_STATUS_INTERNAL, ROFD_STATUS_PAGE_OUT_OF_RANGE,
 };
 use rofd_render::{RenderDiagnostic, RenderDiagnosticKind, RenderReport};
 use std::ffi::CString;
@@ -50,6 +50,7 @@ fn diagnostic_kind(kind: &RenderDiagnosticKind) -> Result<u32, FfiError> {
         RenderDiagnosticKind::ImageFormatUnsupported { .. } => {
             Ok(ROFD_DIAGNOSTIC_IMAGE_BORDER_UNSUPPORTED)
         }
+        RenderDiagnosticKind::SingularTransform => Ok(ROFD_DIAGNOSTIC_SINGULAR_TRANSFORM),
         _ => Err(FfiError::new(
             ROFD_STATUS_INTERNAL,
             "renderer returned a diagnostic kind unknown to C ABI v1",
@@ -204,7 +205,8 @@ mod tests {
     use crate::{
         ROFD_DIAGNOSTIC_FONT_FALLBACK, ROFD_DIAGNOSTIC_IMAGE_BORDER_UNSUPPORTED,
         ROFD_DIAGNOSTIC_IMAGE_MASK_UNSUPPORTED, ROFD_DIAGNOSTIC_IMAGE_SUBSTITUTION_UNSUPPORTED,
-        ROFD_DIAGNOSTIC_MISSING_GLYPH, ROFD_DIAGNOSTIC_UNSUPPORTED_OBJECT,
+        ROFD_DIAGNOSTIC_MISSING_GLYPH, ROFD_DIAGNOSTIC_SINGULAR_TRANSFORM,
+        ROFD_DIAGNOSTIC_UNSUPPORTED_OBJECT,
     };
     use rofd_core::UnsupportedObjectKind;
     use rofd_render::RenderDiagnosticKind;
@@ -246,6 +248,10 @@ mod tests {
             (
                 RenderDiagnosticKind::ImageFormatUnsupported { resource_id: 1 },
                 ROFD_DIAGNOSTIC_IMAGE_BORDER_UNSUPPORTED,
+            ),
+            (
+                RenderDiagnosticKind::SingularTransform,
+                ROFD_DIAGNOSTIC_SINGULAR_TRANSFORM,
             ),
         ];
         for (kind, expected) in kinds {

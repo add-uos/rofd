@@ -134,6 +134,8 @@ pub const ROFD_DIAGNOSTIC_IMAGE_SUBSTITUTION_UNSUPPORTED: u32 = 4;
 pub const ROFD_DIAGNOSTIC_IMAGE_MASK_UNSUPPORTED: u32 = 5;
 /// Diagnostic indicating an unsupported image border.
 pub const ROFD_DIAGNOSTIC_IMAGE_BORDER_UNSUPPORTED: u32 = 6;
+/// Diagnostic indicating an object was skipped because its transform is singular.
+pub const ROFD_DIAGNOSTIC_SINGULAR_TRANSFORM: u32 = 7;
 
 /// Current version of the rofd C ABI.
 pub const ROFD_ABI_VERSION: u32 = 1;

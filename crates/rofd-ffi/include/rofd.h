@@ -144,6 +144,7 @@ typedef uint32_t rofd_status_t;
 #define ROFD_DIAGNOSTIC_IMAGE_SUBSTITUTION_UNSUPPORTED 4u
 #define ROFD_DIAGNOSTIC_IMAGE_MASK_UNSUPPORTED 5u
 #define ROFD_DIAGNOSTIC_IMAGE_BORDER_UNSUPPORTED 6u
+#define ROFD_DIAGNOSTIC_SINGULAR_TRANSFORM 7u
 
 typedef struct rofd_document rofd_document_t;
 typedef struct rofd_metadata rofd_metadata_t;
