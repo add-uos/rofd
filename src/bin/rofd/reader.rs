@@ -77,7 +77,7 @@ pub fn match_snippets(text: &str, query: &str, limit: usize) -> Vec<String> {
     for (i, ch) in chars.iter().enumerate() {
         for lower in ch.to_lowercase() {
             folded.push(lower);
-            positions.extend(std::iter::repeat_n(i, lower.len_utf8()));
+            positions.extend(std::iter::repeat(i).take(lower.len_utf8()));
         }
     }
     let query = query.to_lowercase();

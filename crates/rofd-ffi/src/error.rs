@@ -486,7 +486,7 @@ impl SlotRange {
             return Ok(None);
         }
         let start = pointer as usize;
-        if !start.is_multiple_of(align_of::<T>()) {
+        if start % align_of::<T>() != 0 {
             return Err(());
         }
         let end = start.checked_add(size_of::<T>()).ok_or(())?;
@@ -502,7 +502,7 @@ impl SlotRange {
             return Ok(None);
         }
         let start = pointer as usize;
-        if !start.is_multiple_of(alignment) {
+        if start % alignment != 0 {
             return Err(());
         }
         let end = start.checked_add(size).ok_or(())?;

@@ -29,3 +29,6 @@ target/
 /debian/librofd-ffi0/
 /debian/librofd-ffi-dev/
 .zcode/
+
+# Vendored dependencies for sw_64 offline builds (large, arch-specific)
+vendor/

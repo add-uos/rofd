@@ -241,7 +241,7 @@ impl Color {
             .map(parse_channel)
             .collect::<Result<Vec<_>>>()?;
         let space = match ColorSpaceKind::from_channel_count(channels.len()) {
-            Some(space) if !strict || declared_space.is_none_or(|declared| declared == space) => {
+            Some(space) if !strict || declared_space.map_or(true, |declared| declared == space) => {
                 space
             }
             _ => {

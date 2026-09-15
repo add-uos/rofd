@@ -1084,11 +1084,11 @@ impl RenderGeometry {
             || viewport
                 .x
                 .checked_add(viewport.width)
-                .is_none_or(|right| right > canvas.pixel_width)
+                .map_or(true, |right| right > canvas.pixel_width)
             || viewport
                 .y
                 .checked_add(viewport.height)
-                .is_none_or(|bottom| bottom > canvas.pixel_height)
+                .map_or(true, |bottom| bottom > canvas.pixel_height)
         {
             return Err(Error::InvalidOption {
                 field: "viewport",
