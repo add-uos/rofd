@@ -56,6 +56,42 @@ path passed on the command line), renders pages through `rofd-core` and
 `rofd-render`, and supports page navigation. Note the `-p rofd` flag: the root
 package is not part of the workspace's `default-members`.
 
+# Offline (intranet) builds
+
+All third-party crates are vendored into the local `vendor/` directory and
+crates.io is replaced with it via `.cargo/config.toml` (with `net.offline`
+enabled), so builds never touch the network. When a crate is missing, cargo
+fails fast instead of attempting a download.
+
+To build the Debian packages on an air-gapped machine:
+
+1. Copy the whole source tree (including `vendor/`, `.cargo/config.toml`,
+   and `Cargo.lock`) to the air-gapped machine.
+2. Install the system build dependencies (see `debian/control`) from the
+   internal apt mirror: `debhelper-compat (= 13)`, `cargo`, `rustc`
+   (>= 1.88, e.g. via rustup), `pkg-config`, `libcairo2-dev`,
+   `libfreetype-dev`, `libjbig2dec0-dev`, `qt6-base-dev`,
+   `qt6-declarative-dev`.
+3. Inside the source tree run:
+   ```bash
+   dpkg-buildpackage -us -uc -b
+   ```
+   No preparation scripts are needed: `debian/rules` takes care of the
+   rest (`--offline --locked` build, the isolated `debian/.cargo-home`,
+   and protecting `vendor/` from debhelper cleanup and rewrites).
+
+Day-to-day development is offline by default: every `cargo` command resolves
+dependencies from `vendor/`. To add or upgrade dependencies (on a machine
+with network access):
+
+```bash
+CARGO_NET_OFFLINE=false cargo vendor vendor
+```
+
+The regenerated `vendor/` is ready to use as-is; when packaging,
+`debian/rules` keeps the vendored files intact against `dh_clean` deletions
+and autotools-config updates.
+
 # Project structure
 
 This project is organized into the following directories and files:
