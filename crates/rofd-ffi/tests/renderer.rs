@@ -1,4 +1,4 @@
-use std::ffi::{CStr, CString};
+use std::ffi::{c_char, CStr, CString};
 use std::mem::{size_of, MaybeUninit};
 use std::path::PathBuf;
 use std::ptr;
@@ -734,7 +734,7 @@ fn diagnostic_access_is_transactional_and_preserves_the_version_boundary() {
                 struct_size: declared_size,
                 kind: u32::MAX,
                 object_id: u64::MAX,
-                message: ptr::NonNull::<i8>::dangling().as_ptr(),
+                message: ptr::NonNull::<c_char>::dangling().as_ptr(),
             },
             future_tail: [0xa5a5_a5a5_a5a5_a5a5; 2],
         };
@@ -750,7 +750,7 @@ fn diagnostic_access_is_transactional_and_preserves_the_version_boundary() {
 
         extended.v1.kind = u32::MAX;
         extended.v1.object_id = u64::MAX;
-        extended.v1.message = ptr::NonNull::<i8>::dangling().as_ptr();
+        extended.v1.message = ptr::NonNull::<c_char>::dangling().as_ptr();
         assert_eq!(
             rofd_render_report_get_diagnostic(report, usize::MAX, &mut extended.v1, &mut error),
             ROFD_STATUS_PAGE_OUT_OF_RANGE
