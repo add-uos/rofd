@@ -20,6 +20,16 @@ precedence = "override"
 SPDX-FileCopyrightText = "2026 ofdrw contributors"
 SPDX-License-Identifier = "Apache-2.0"
 
+# wit-bindgen 0.57.1 补丁副本（patches/wit-bindgen），复制自 crates.io 上游，
+# 上游双/三许可保持不变
+[[annotations]]
+path = "patches/wit-bindgen/**"
+precedence = "override"
+SPDX-FileCopyrightText = "Alex Crichton and wit-bindgen contributors"
+SPDX-License-Identifier = "Apache-2.0 WITH LLVM-exception"
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-License-Identifier = "MIT"
+
 # 随仓留档的国家标准文本，非自由许可，仅作开发参考
 [[annotations]]
 path = "learning/GBT_33190-2016_*.pdf"

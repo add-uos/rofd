@@ -53,7 +53,13 @@ thiserror = "2.0.20"
 xml-rs = "0.8.27"
 zip = { version = "2.4.2", default-features = false, features = ["deflate"] }
 
+# Patches for rustc/cargo 1.81 build hosts (loongarch64/sw_64):
+#
 # Patch: replace nightly-only `unbounded_shr` with stable `checked_shr`
-# (required for rustc 1.81 used on loongarch64/sw_64 build hosts)
 [patch.crates-io]
 deflate64 = { path = "patches/deflate64" }
+
+# Patch: downgrade the manifest from edition 2024 (cargo >= 1.85) to
+# edition 2021 so cargo 1.81 can load the vendored sources. The crate is
+# only ever needed for wasm32 targets and is never compiled here.
+wit-bindgen = { path = "patches/wit-bindgen" }
