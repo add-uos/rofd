@@ -1,3 +1,13 @@
+rofd (0.4.1-1) unstable; urgency=medium
+
+  * chore: Update version to 0.4.1-1
+  * fix: build with rustc 1.81 (MSRV lock, stable APIs, deflate64 patch)
+  * docs: add README.zh_CN.md
+  * chore(reuse): add REUSE.toml and license texts for compliance
+  * fix(ffi): map SingularTransform diagnostic to C ABI v1
+
+ -- zhanghongyuan <zhanghongyuan@uniontech.com>  Fri, 18 Sep 2026 13:26:04 +0800
+
 rofd (0.4.0-1) unstable; urgency=medium
 
   * Add pixel viewport rendering without allocating a full-page raster.
