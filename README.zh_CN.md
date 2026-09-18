@@ -52,6 +52,38 @@ Qt 命令需要 `qmetaobject` 所依赖的系统 Qt6 开发包。原型通过"�
 命令行传入路径）打开 OFD 文档，经由 `rofd-core` 与 `rofd-render` 渲染页面，
 并支持页面翻页。注意 `-p rofd` 参数：根包不在工作区的 `default-members` 中。
 
+# 离线 / 内网构建
+
+本项目所有第三方 crate 均已下载到本地 `vendor/` 目录，并通过
+`.cargo/config.toml` 将 crates.io 替换为该目录（同时开启 `net.offline`），
+构建过程完全不访问外网；若缺少某个 crate，cargo 会直接报错而不是尝试
+联网下载。
+
+在内网机器上直接打包 Debian 包：
+
+1. 把整个源码目录（含 `vendor/`、`.cargo/config.toml`、`Cargo.lock`）
+   拷贝到内网机器。
+2. 从内部 apt 源安装系统构建依赖（见 `debian/control`）：`debhelper-compat (= 13)`、
+   `cargo`、`rustc`（需 ≥ 1.88，可用 rustup）、`pkg-config`、`libcairo2-dev`、
+   `libfreetype-dev`、`libjbig2dec0-dev`、`qt6-base-dev`、`qt6-declarative-dev`。
+3. 在源码目录中执行：
+   ```bash
+   dpkg-buildpackage -us -uc -b
+   ```
+   无需任何前置脚本：`debian/rules` 已处理其余事项（`--offline --locked`
+   构建、隔离的 `debian/.cargo-home`、以及保护 `vendor/` 不被 debhelper
+   清理或改写）。
+
+日常开发同样默认离线：所有 `cargo` 命令都从 `vendor/` 解析依赖。新增或
+升级依赖时（需要有外网的机器）：
+
+```bash
+CARGO_NET_OFFLINE=false cargo vendor vendor
+```
+
+重新生成的 `vendor/` 直接使用即可，无需其他处理；打包时 `debian/rules`
+会保护 vendored 文件不被 dh_clean 删除、不被 autotools 更新改写。
+
 # 项目结构
 
 本项目按如下目录与文件组织：

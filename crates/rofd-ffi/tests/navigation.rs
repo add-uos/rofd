@@ -7,6 +7,14 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use rofd_ffi::*;
 use zip::{write::SimpleFileOptions, ZipWriter};
 
+fn dangling<T>() -> *const T {
+    std::ptr::NonNull::dangling().as_ptr() as *const T
+}
+
+fn dangling_mut<T>() -> *mut T {
+    std::ptr::NonNull::dangling().as_ptr()
+}
+
 struct Document(*mut rofd_document_t);
 
 impl Document {
@@ -338,17 +346,12 @@ fn outline_queries_reject_null_indices_aliases_and_malformed_addresses() {
         );
         assert_eq!(count, 0x12345678);
         assert_eq!(
-            rofd_outline_get_count(ptr::dangling::<u8>().cast(), &mut count, ptr::null_mut()),
+            rofd_outline_get_count(dangling::<u8>().cast(), &mut count, ptr::null_mut()),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(count, 0x12345678);
         assert_eq!(
-            rofd_outline_get_node(
-                outline,
-                0,
-                ptr::dangling_mut::<u8>().cast(),
-                ptr::null_mut()
-            ),
+            rofd_outline_get_node(outline, 0, dangling_mut::<u8>().cast(), ptr::null_mut()),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(

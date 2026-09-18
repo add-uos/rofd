@@ -4,11 +4,18 @@ include /usr/share/dpkg/architecture.mk
 
 export DH_VERBOSE = 1
 
+# Air-gapped (intranet) builds: all crates are vendored in ./vendor (see
+# .cargo/config.toml). Build hermetically with an isolated CARGO_HOME so the
+# build host's ~/.cargo (mirrors, proxies) cannot influence the result, and
+# forbid any network access outright.
+export CARGO_HOME = $(CURDIR)/debian/.cargo-home
+export CARGO_NET_OFFLINE = true
+
 %:
 	dh $@
 
 override_dh_auto_build:
-	cargo build --release -p rofd-ffi -p rofd --features rofd/qt-reader
+	cargo build --release --offline --locked -p rofd-ffi -p rofd --features rofd/qt-reader
 
 override_dh_auto_install:
 	install -D -m0755 target/release/rofd \
@@ -30,3 +37,18 @@ override_dh_auto_install:
 
 override_dh_auto_clean:
 	cargo clean
+	rm -rf debian/.cargo-home
+
+# Vendored crates are checksummed by cargo (vendor/*/.cargo-checksum.json).
+# Three debhelper steps would break those checksums or tracked sources, so
+# all are neutralized:
+#
+#  - dh_clean deletes detritus like *.orig / *~ anywhere in the tree, which
+#    includes files shipped inside vendored crates (vendor/*) and crate
+#    patch copies (patches/*);
+#  - dh_update_autotools_config replaces vendored config.guess / config.sub
+#    with the system copies (the project itself has no autotools files).
+override_dh_clean:
+	dh_clean -X vendor/ -X patches/
+
+override_dh_update_autotools_config:

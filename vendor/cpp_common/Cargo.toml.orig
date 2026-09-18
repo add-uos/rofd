@@ -1,0 +1,17 @@
+[package]
+name = "cpp_common"
+version.workspace = true
+authors = ["Nika Layzell <nika@thelayzells.com>", "Olivier Goffart <olivier.goffart@slint.dev>"]
+edition.workspace = true
+rust-version.workspace = true
+description = "Implementation details crate for the `cpp` crate"
+readme = "../README.md"
+license.workspace = true
+keywords = ["c", "cxx", "ffi", "compiler", "build-dependencies"]
+categories = ["development-tools::ffi"]
+repository = "https://github.com/mystor/rust-cpp"
+documentation = "https://docs.rs/cpp_common"
+
+[dependencies]
+syn = { version = "2.0", features = ["full", "extra-traits"] }
+proc-macro2 = "1.0"

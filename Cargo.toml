@@ -22,8 +22,8 @@ qmetaobject = { version = "0.2.10", optional = true }
 rofd-core = { path = "crates/rofd-core", optional = true }
 rofd-render = { path = "crates/rofd-render", optional = true }
 serde = { version = "1.0.217", features = ["derive"] }
-serde-xml-rs = "0.6.0"
-zip = "2.2.2"
+serde-xml-rs = { workspace = true }
+zip = { workspace = true }
 
 [[bin]]
 name = "rofd"
@@ -52,8 +52,3 @@ serde-xml-rs = "0.6.0"
 thiserror = "2.0.20"
 xml-rs = "0.8.27"
 zip = { version = "2.4.2", default-features = false, features = ["deflate"] }
-
-# Patch: replace nightly-only `unbounded_shr` with stable `checked_shr`
-# (required for rustc 1.81 used on loongarch64/sw_64 build hosts)
-[patch.crates-io]
-deflate64 = { path = "patches/deflate64" }

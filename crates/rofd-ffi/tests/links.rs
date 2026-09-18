@@ -7,6 +7,14 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use rofd_ffi::*;
 use zip::{write::SimpleFileOptions, ZipWriter};
 
+fn dangling<T>() -> *const T {
+    std::ptr::NonNull::dangling().as_ptr() as *const T
+}
+
+fn dangling_mut<T>() -> *mut T {
+    std::ptr::NonNull::dangling().as_ptr()
+}
+
 fn open(page_xml: &str, strict: bool) -> (*mut rofd_document_t, *mut rofd_page_t) {
     static NEXT: AtomicUsize = AtomicUsize::new(0);
     let mut zip = ZipWriter::new(Cursor::new(Vec::new()));
@@ -225,7 +233,7 @@ fn empty_pages_have_owned_empty_snapshots_and_invalid_regions_never_fall_back() 
         let (document, page) = open(xml, strict);
         // SAFETY: Handles and independent output storage remain live for each call.
         unsafe {
-            let mut links = ptr::dangling_mut();
+            let mut links = dangling_mut();
             let mut error = ptr::null_mut();
             assert_eq!(rofd_page_get_links(page, &mut links, &mut error), expected);
             if expected == ROFD_STATUS_OK {
@@ -357,7 +365,7 @@ fn link_query_failures_zero_outputs_and_preserve_aliases() {
         );
         assert!(error.is_null());
         assert_eq!(
-            rofd_link_list_get_count(ptr::dangling::<u8>().cast(), &mut count, ptr::null_mut()),
+            rofd_link_list_get_count(dangling::<u8>().cast(), &mut count, ptr::null_mut()),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(count, 0x12345678);
@@ -449,7 +457,7 @@ fn link_snapshot_output_preflight_does_not_mutate_source_page_or_aliased_slots()
     // SAFETY: The live page and output storage remain valid; deliberate aliases
     // and malformed layouts are rejected before writes or page dereferences.
     unsafe {
-        let mut output: *mut rofd_link_list_t = ptr::dangling_mut();
+        let mut output: *mut rofd_link_list_t = dangling_mut();
         let before = output;
         let slot = &mut output as *mut *mut rofd_link_list_t;
         assert_eq!(
@@ -465,7 +473,7 @@ fn link_snapshot_output_preflight_does_not_mutate_source_page_or_aliased_slots()
         assert!(!error.is_null());
         rofd_error_free(error);
         assert_eq!(
-            rofd_page_get_links(ptr::dangling::<u8>().cast(), &mut output, ptr::null_mut()),
+            rofd_page_get_links(dangling::<u8>().cast(), &mut output, ptr::null_mut()),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(output, before);

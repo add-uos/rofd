@@ -1212,6 +1212,10 @@ pub unsafe extern "C" fn rofd_error_free(error: *mut rofd_error_t) {
 
 #[cfg(test)]
 mod tests {
+
+    fn dangling_mut<T>() -> *mut T {
+        std::ptr::NonNull::dangling().as_ptr()
+    }
     use super::*;
     use crate::handles::{drop_raw_handle, TestHandleStorage, TestHandleToken};
     use crate::{
@@ -1260,7 +1264,7 @@ mod tests {
 
     #[test]
     fn boundary_catches_panic_after_initializing_outputs() {
-        let mut output = ptr::dangling_mut::<TestHandleToken>();
+        let mut output = dangling_mut::<TestHandleToken>();
         let mut error: *mut rofd_error_t = ptr::null_mut();
 
         let status = unsafe {
@@ -1284,7 +1288,7 @@ mod tests {
 
     #[test]
     fn boundary_clears_the_error_slot_on_success() {
-        let mut old_error = ptr::dangling_mut::<rofd_error_t>();
+        let mut old_error = dangling_mut::<rofd_error_t>();
         let status = unsafe { boundary(&mut old_error, (), || Ok(())) };
         assert_eq!(status, crate::ROFD_STATUS_OK);
         assert!(old_error.is_null());
@@ -1292,7 +1296,7 @@ mod tests {
 
     #[test]
     fn all_outputs_are_initialized_before_a_missing_required_output_is_reported() {
-        let mut later_handle = ptr::dangling_mut::<TestHandleToken>();
+        let mut later_handle = dangling_mut::<TestHandleToken>();
         let mut scalar = 99_usize;
         let mut called = false;
         let status = unsafe {
@@ -1318,7 +1322,7 @@ mod tests {
     #[test]
     fn staged_owned_output_is_dropped_when_operation_panics() {
         let drops = Arc::new(AtomicUsize::new(0));
-        let mut output = ptr::dangling_mut::<TestHandleToken>();
+        let mut output = dangling_mut::<TestHandleToken>();
         let status = unsafe {
             boundary(
                 ptr::null_mut(),
@@ -1375,7 +1379,7 @@ mod tests {
 
     #[test]
     fn failure_replaces_a_prefilled_error_slot_with_a_new_error() {
-        let sentinel = ptr::dangling_mut::<rofd_error_t>();
+        let sentinel = dangling_mut::<rofd_error_t>();
         let mut error = sentinel;
         let status = unsafe {
             boundary(&mut error, (), || {
@@ -1392,7 +1396,7 @@ mod tests {
 
     #[test]
     fn aliased_handle_outputs_are_rejected_without_touching_them() {
-        let sentinel = ptr::dangling_mut::<TestHandleToken>();
+        let sentinel = dangling_mut::<TestHandleToken>();
         let mut output = sentinel;
         let mut error = ptr::null_mut();
         let mut called = false;
@@ -1454,7 +1458,7 @@ mod tests {
 
     #[test]
     fn error_and_handle_output_alias_is_rejected_without_touching_either_slot() {
-        let sentinel = ptr::dangling_mut::<rofd_error_t>();
+        let sentinel = dangling_mut::<rofd_error_t>();
         let mut shared = sentinel;
         let mut called = false;
         let status = unsafe {

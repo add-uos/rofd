@@ -21,6 +21,7 @@ target/
 
 # Debian packaging artifacts
 /debian/.debhelper/
+/debian/.cargo-home/
 /debian/debhelper-build-stamp
 /debian/files
 /debian/*.debhelper*
@@ -30,5 +31,7 @@ target/
 /debian/librofd-ffi-dev/
 .zcode/
 
-# Vendored dependencies for sw_64 offline builds (large, arch-specific)
+# Vendored crates.io dependencies: required for offline / intranet builds
+# (see .cargo/config.toml). Refresh on an internet-connected machine with
+# `cargo vendor vendor` and ship this directory with the source.
 vendor/

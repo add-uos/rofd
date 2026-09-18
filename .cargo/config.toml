@@ -1,0 +1,27 @@
+# Offline (air-gapped / intranet) build configuration.
+#
+# All third-party crates are vendored into the `vendor/` directory at the
+# repository root (regenerate with `cargo vendor vendor` on a machine with
+# network access). Source replacement below makes crates.io unreachable:
+# cargo resolves every dependency from `vendor/` and hard-fails instead of
+# touching the network when something is missing.
+#
+# `net.offline = true` additionally forbids any network access (git deps,
+# registry updates, ...). To temporarily allow the network — e.g. to add a
+# new dependency before re-vendoring — run:
+#     CARGO_NET_OFFLINE=false cargo vendor vendor
+#
+# NOTE: the vendor directory must cover the whole Cargo.lock graph, not just
+# what Linux builds compile: lock re-resolution (any dependency change, a
+# cargo version bump on build hosts, ...) needs the manifests of every
+# locked package, including target-gated ones such as windows-sys and
+# dev-dependencies like arbitrary. Do not hand-delete those from vendor/.
+
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+
+[net]
+offline = true

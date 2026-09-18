@@ -7,6 +7,10 @@ use std::mem::{size_of, MaybeUninit};
 use std::ptr;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+fn dangling_mut<T>() -> *mut T {
+    std::ptr::NonNull::dangling().as_ptr()
+}
+
 fn page_with_layer(layer: &str) -> *mut rofd_page_t {
     static NEXT: AtomicUsize = AtomicUsize::new(0);
     let xml = format!(
@@ -231,8 +235,8 @@ fn null_and_invalid_arguments_publish_transactional_defaults() {
         assert_eq!(rofd_string_get_length(ptr::null()), 0);
         rofd_string_free(ptr::null_mut());
         rofd_text_layout_free(ptr::null_mut());
-        let mut text = ptr::dangling_mut();
-        let mut layout = ptr::dangling_mut();
+        let mut text = dangling_mut();
+        let mut layout = dangling_mut();
         let mut error = ptr::null_mut();
         assert_eq!(
             rofd_page_get_text(ptr::null(), &mut text, &mut error),
@@ -366,7 +370,7 @@ fn preflight_rejects_output_aliases_and_input_overlap_without_corruption() {
             rofd_page_get_text_layout(page, &mut layout, ptr::null_mut()),
             ROFD_STATUS_OK
         );
-        let mut slot: *mut rofd_string_t = ptr::dangling_mut();
+        let mut slot: *mut rofd_string_t = dangling_mut();
         let sentinel = slot;
         let raw = &mut slot as *mut *mut rofd_string_t;
         assert_eq!(
@@ -634,7 +638,7 @@ fn search_rejects_invalid_inputs_and_preserves_overlap_storage() {
         let empty = CString::new("").unwrap();
         let invalid_utf8 = [0xff_u8, 0];
         for query in [ptr::null(), empty.as_ptr(), invalid_utf8.as_ptr().cast()] {
-            let mut search = ptr::dangling_mut();
+            let mut search = dangling_mut();
             assert_eq!(
                 rofd_page_find_text(page, query, &mut search, ptr::null_mut()),
                 ROFD_STATUS_INVALID_ARGUMENT
@@ -652,7 +656,7 @@ fn search_rejects_invalid_inputs_and_preserves_overlap_storage() {
         for (flags, max_results) in [(1_u32 << 31, 1), (0, 0)] {
             options.flags = flags;
             options.max_results = max_results;
-            let mut search = ptr::dangling_mut();
+            let mut search = dangling_mut();
             assert_eq!(
                 rofd_page_find_text_with_options(
                     page,
@@ -667,7 +671,7 @@ fn search_rejects_invalid_inputs_and_preserves_overlap_storage() {
         }
 
         options.struct_size = 4;
-        let mut search = ptr::dangling_mut();
+        let mut search = dangling_mut();
         assert_eq!(
             rofd_page_find_text_with_options(
                 page,
@@ -729,7 +733,7 @@ fn search_rejects_invalid_inputs_and_preserves_overlap_storage() {
             size_of::<rofd_find_options_t>()
         );
 
-        let mut alias: *mut rofd_text_search_t = ptr::dangling_mut();
+        let mut alias: *mut rofd_text_search_t = dangling_mut();
         let sentinel = alias;
         let alias_ptr = &mut alias as *mut *mut rofd_text_search_t;
         assert_eq!(
@@ -805,7 +809,7 @@ fn search_and_selection_accessors_are_transactional() {
             width_mm: 100.0,
             height_mm: 100.0,
         };
-        let mut selection = ptr::dangling_mut();
+        let mut selection = dangling_mut();
         assert_eq!(
             rofd_page_get_selected_text(
                 page,
@@ -898,7 +902,7 @@ fn search_and_selection_accessors_are_transactional() {
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(overlap_area.width_mm, area.width_mm);
-        let mut alias: *mut rofd_text_selection_t = ptr::dangling_mut();
+        let mut alias: *mut rofd_text_selection_t = dangling_mut();
         let sentinel = alias;
         let alias_ptr = &mut alias as *mut *mut rofd_text_selection_t;
         assert_eq!(

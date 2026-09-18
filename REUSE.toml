@@ -20,6 +20,9 @@ precedence = "override"
 SPDX-FileCopyrightText = "2026 ofdrw contributors"
 SPDX-License-Identifier = "Apache-2.0"
 
+
+SPDX-License-Identifier = "MIT"
+
 # 随仓留档的国家标准文本，非自由许可，仅作开发参考
 [[annotations]]
 path = "learning/GBT_33190-2016_*.pdf"

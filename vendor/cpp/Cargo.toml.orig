@@ -1,0 +1,19 @@
+[package]
+name = "cpp"
+version.workspace = true
+authors = ["Nika Layzell <nika@thelayzells.com>", "Olivier Goffart <olivier.goffart@slint.dev>"]
+edition.workspace = true
+rust-version.workspace = true
+description = "Inline C++ code closures"
+readme = "../README.md"
+license.workspace = true
+keywords = ["c", "cxx", "ffi", "compiler"]
+categories = ["development-tools::ffi"]
+repository = "https://github.com/mystor/rust-cpp"
+documentation = "https://docs.rs/cpp"
+
+[dependencies]
+cpp_macros = { version = "=0.5.11", path = "../cpp_macros" }
+
+[dev-dependencies]
+cpp_build = { version = "=0.5.11", path = "../cpp_build" }
