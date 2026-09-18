@@ -6,6 +6,10 @@ use std::ptr;
 use cairo::{Context, Format, ImageSurface};
 use rofd_ffi::*;
 
+fn dangling_mut<T>() -> *mut T {
+    std::ptr::NonNull::dangling().as_ptr()
+}
+
 struct Fixture {
     page: *mut rofd_page_t,
     renderer: *mut rofd_renderer_t,
@@ -219,7 +223,7 @@ fn invalid_viewports_clear_reports_and_return_exact_errors() {
             ..viewport(0, 0, 10, 10)
         },
     ] {
-        let mut report = ptr::dangling_mut();
+        let mut report = dangling_mut();
         let mut error = ptr::null_mut();
         // SAFETY: Invalid values are supported error cases; pointers remain live and disjoint.
         unsafe {
@@ -240,7 +244,7 @@ fn invalid_viewports_clear_reports_and_return_exact_errors() {
             rofd_error_free(error);
         }
     }
-    let mut report = ptr::dangling_mut();
+    let mut report = dangling_mut();
     // SAFETY: NULL required arguments are explicitly supported failures.
     unsafe {
         assert_eq!(

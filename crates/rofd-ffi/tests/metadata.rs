@@ -7,6 +7,14 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use rofd_ffi::*;
 use zip::{write::SimpleFileOptions, ZipWriter};
 
+fn dangling<T>() -> *const T {
+    std::ptr::NonNull::dangling().as_ptr() as *const T
+}
+
+fn dangling_mut<T>() -> *mut T {
+    std::ptr::NonNull::dangling().as_ptr()
+}
+
 struct Document(*mut rofd_document_t);
 
 impl Document {
@@ -90,8 +98,8 @@ fn warning() -> rofd_warning_t {
     rofd_warning_t {
         struct_size: size_of::<rofd_warning_t>() as u32,
         code: 77,
-        path: ptr::dangling(),
-        message: ptr::dangling(),
+        path: dangling(),
+        message: dangling(),
     }
 }
 
@@ -207,8 +215,8 @@ fn null_handles_outputs_and_frees_obey_the_contract() {
         }
         rofd_metadata_free(ptr::null_mut());
         rofd_warning_list_free(ptr::null_mut());
-        let mut metadata = ptr::dangling_mut();
-        let mut warnings = ptr::dangling_mut();
+        let mut metadata = dangling_mut();
+        let mut warnings = dangling_mut();
         let mut error = ptr::null_mut();
         assert_eq!(
             rofd_document_get_metadata(ptr::null(), &mut metadata, &mut error),
@@ -234,7 +242,7 @@ fn null_handles_outputs_and_frees_obey_the_contract() {
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(count, 0);
-        let mut keyword = ptr::dangling();
+        let mut keyword = dangling();
         assert_eq!(
             rofd_metadata_get_keyword(ptr::null(), 0, &mut keyword, ptr::null_mut()),
             ROFD_STATUS_INVALID_ARGUMENT
@@ -321,7 +329,7 @@ fn out_of_range_and_versioned_warning_outputs_are_transactional() {
         );
         assert_eq!((*record).struct_size, 4);
         assert_eq!((*record).code, 99);
-        let mut keyword = ptr::dangling();
+        let mut keyword = dangling();
         error = ptr::null_mut();
         assert_eq!(
             rofd_metadata_get_keyword(metadata, usize::MAX, &mut keyword, &mut error),
@@ -412,35 +420,35 @@ fn invalid_address_layouts_leave_all_outputs_untouched() {
     let warnings = document.warnings();
     // SAFETY: Malformed addresses are never dereferenced; this explicitly checks preflight.
     unsafe {
-        let mut result = ptr::dangling_mut();
-        let mut error = ptr::dangling_mut();
-        let malformed = ptr::dangling::<u8>().cast::<rofd_document_t>();
+        let mut result = dangling_mut();
+        let mut error = dangling_mut();
+        let malformed = dangling::<u8>().cast::<rofd_document_t>();
         assert_eq!(
             rofd_document_get_metadata(malformed, &mut result, &mut error),
             ROFD_STATUS_INVALID_ARGUMENT
         );
-        assert_eq!(result, ptr::dangling_mut());
-        assert_eq!(error, ptr::dangling_mut());
-        let mut list = ptr::dangling_mut();
+        assert_eq!(result, dangling_mut());
+        assert_eq!(error, dangling_mut());
+        let mut list = dangling_mut();
         assert_eq!(
             rofd_document_get_warnings(malformed, &mut list, &mut error),
             ROFD_STATUS_INVALID_ARGUMENT
         );
-        assert_eq!(list, ptr::dangling_mut());
+        assert_eq!(list, dangling_mut());
         let mut count = 97;
         assert_eq!(
-            rofd_metadata_get_keyword_count(ptr::dangling::<u8>().cast(), &mut count, &mut error),
+            rofd_metadata_get_keyword_count(dangling::<u8>().cast(), &mut count, &mut error),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(count, 97);
         assert_eq!(
-            rofd_warning_list_get_count(ptr::dangling::<u8>().cast(), &mut count, &mut error),
+            rofd_warning_list_get_count(dangling::<u8>().cast(), &mut count, &mut error),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(count, 97);
         let mut record = warning();
         assert_eq!(
-            rofd_warning_list_get_warning(ptr::dangling::<u8>().cast(), 0, &mut record, &mut error),
+            rofd_warning_list_get_warning(dangling::<u8>().cast(), 0, &mut record, &mut error),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(record.code, 77);
@@ -451,28 +459,23 @@ fn invalid_address_layouts_leave_all_outputs_untouched() {
         );
         assert_eq!(count, 97);
         assert_eq!(
-            rofd_metadata_get_keyword_count(metadata, ptr::dangling_mut::<u8>().cast(), &mut error),
+            rofd_metadata_get_keyword_count(metadata, dangling_mut::<u8>().cast(), &mut error),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(
-            rofd_warning_list_get_count(warnings, &mut count, ptr::dangling_mut::<u8>().cast()),
+            rofd_warning_list_get_count(warnings, &mut count, dangling_mut::<u8>().cast()),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(count, 97);
         assert_eq!(
-            rofd_warning_list_get_warning(
-                warnings,
-                0,
-                ptr::dangling_mut::<u8>().cast(),
-                &mut error
-            ),
+            rofd_warning_list_get_warning(warnings, 0, dangling_mut::<u8>().cast(), &mut error),
             ROFD_STATUS_INVALID_ARGUMENT
         );
         assert_eq!(
             rofd_warning_list_get_warning(warnings, 0, overflow.cast_mut().cast(), &mut error),
             ROFD_STATUS_INVALID_ARGUMENT
         );
-        assert_eq!(error, ptr::dangling_mut());
+        assert_eq!(error, dangling_mut());
         rofd_metadata_free(metadata);
         rofd_warning_list_free(warnings);
     }
