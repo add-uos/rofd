@@ -1,3 +1,10 @@
+rofd (0.4.2-1) unstable; urgency=medium
+
+  * chore: Update version to 0.4.2-1
+  * chore(build): vendor all crates for offline intranet builds
+
+ -- zhanghongyuan <zhanghongyuan@uniontech.com>  Sun, 20 Sep 2026 13:23:14 +0800
+
 rofd (0.4.1-1) unstable; urgency=medium
 
   * chore: Update version to 0.4.1-1
